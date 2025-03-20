@@ -9,8 +9,9 @@ Assunto che:
   
 
 - Un 'p' equivale a 20 's', e v.v.
-- Un 's' equivale a 12 'd', e v.v.
+- Un 's' equivale a 12 'd', e v.v.  
 
+  
 - 's' sarà sempre compreso fra 0 e 19,
 - 'd' sarà sempre compreso fra 0 e 11,
 
@@ -37,3 +38,31 @@ Assunto che:
 2. calcolo il quoziente fra S e 20 = q''
 
 1. sommo p', p'' e q'', scrivo in P
+
+## Algoritmo risolutivo per la sottrazione
+
+# Soluzione
+
+- Trasformare i P e gli S in D.
+- Effettuare l'operazione matematica
+- Riconvertire il risultato in P, S, D 
+
+
+# Endpoints
+
+### GET /sum 
+### GET /subtraction
+### GET /multiplication
+
+  - Parametri query
+    - 1° valore 
+    - 2° valore 
+  Formato parametri: stringa (XpYsZd)  
+
+  - Risposta
+    - stringa nel seguente formato: XpYsZd
+
+### GET /division
+    - Risposta
+    - stringa nel seguente formato: XpYsZd (in base al caso, potrà esser inserito il seguente valore: (XpYsZd)
+
