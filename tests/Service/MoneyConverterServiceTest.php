@@ -27,4 +27,15 @@ class MoneyConverterServiceTest extends TestCase
         $this->assertTrue($result[0] == 12);
         $this->assertTrue($result[1] == 6);
     }
+
+    public function test(){ //5p 17s 8d = 1412 pences (first value)
+        $firstValueInPences = MoneyConverterService::convertPoundsToPences(5) + MoneyConverterService::convertShillingsToPences(17) + 8;
+
+        // 3p 4s 10d
+        $secondValueInPences =MoneyConverterService::convertPoundsToPences(3) + MoneyConverterService::convertShillingsToPences(4) + 10;
+
+
+
+        var_dump(MoneyConverterService::convertPencesToPoundsCompleteFormat($firstValueInPences+$secondValueInPences));
+    }
 }

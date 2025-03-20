@@ -26,4 +26,28 @@ class MoneyConverterService {
         $remaining = $pences % self::SHILLING_IN_PENCES;
         return [$shillings, $remaining];
     }
+
+
+    public static function convertShillingsToPounds(mixed $shillings): array
+    {
+        $pounds = intdiv($shillings, self::POUND_IN_SHILLING);
+        $remaining = ($shillings % self::POUND_IN_SHILLING) + $shillings[1];
+        return [$pounds, $remaining];
+    }
+
+    /**
+     * @param  int  $pounds
+     * @return array    result[0] - Pounds
+     *                  result[1] - Shillings
+     *                  result[2] - pences
+     *
+     */
+    public static function convertPencesToPoundsCompleteFormat(int $pences): array
+    {
+        [$shillings, $pences] = self::convertPencesToShillings($pences);
+
+        [$pounds, $shillings] = self::convertShillingsToPounds($shillings);
+
+        return [$pounds, $shillings, $pences];
+    }
 }
