@@ -12,13 +12,30 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
+use OpenApi\Attributes as OA;
 
+#[Route('/api/v1', name: 'api_' ), ]
 class MoneyConverterController extends AbstractController {
 
     public const REGEX_VALIDATION_VALUE = "/([0-9]+)p([0-9]+)s([0-9]+)d/i";
 
-
-    #[Route('/sum')]
+    #[Route('/sum', methods: ['GET'], name: 'sum')]
+    #[OA\Response(
+        response: 200,
+        description: 'Returns the sum of two amounts',
+    )]
+    #[OA\Parameter(
+        name: 'firstValue',
+        description: 'The first value of the amount to be sum',
+        in: 'query',
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Parameter(
+        name: 'secondValue',
+        description: 'The second value of the amount to be sum to the first',
+        in: 'query',
+        schema: new OA\Schema(type: 'string')
+    )]
     public function addition(
         #[MapQueryParameter] string $firstValue,
         #[MapQueryParameter] string $secondValue,
@@ -71,7 +88,7 @@ class MoneyConverterController extends AbstractController {
          */
     }
 
-    #[Route('/subtraction')]
+    #[Route('/subtraction', methods: ['GET'])]
     public function subtraction(
         #[MapQueryParameter] string $firstValue,
         #[MapQueryParameter] string $secondValue,
@@ -120,7 +137,7 @@ class MoneyConverterController extends AbstractController {
          */
     }
 
-    #[Route('/multiplication')]
+    #[Route('/multiplication', methods: ['GET'])]
     public function multiplication(
         #[MapQueryParameter] string $firstValue,
         #[MapQueryParameter] int $multiplier,
@@ -162,7 +179,7 @@ class MoneyConverterController extends AbstractController {
          */
     }
 
-    #[Route('/division')]
+    #[Route('/division', methods: ['GET'])]
     public function division(
         #[MapQueryParameter] string $firstValue,
         #[MapQueryParameter] int $divider,
