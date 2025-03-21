@@ -2,52 +2,35 @@
 
 namespace App\Service;
 
+use App\Models\Amount;
+
 class MoneyConverterService {
-    const POUND_IN_SHILLING = 20;
-    const SHILLING_IN_PENCES = 12;
-    const POUND_IN_PENCES = self::POUND_IN_SHILLING * self::SHILLING_IN_PENCES;
-
-    public static function convertPoundsToPences(int $pounds): int {
-        $poundsInShillings = self::convertPoundsToShillings($pounds);
-        return self::convertShillingsToPences($poundsInShillings);
-    }
-
-    public static function convertPoundsToShillings(int $pounds): int {
-        return $pounds * self::POUND_IN_SHILLING;
-    }
-    public static function convertShillingsToPences(int $shillings): int {
-        return $shillings * self::SHILLING_IN_PENCES;
-    }
-
-    /** Return an array in which the first value is the shillings, and the other is the remaining part in pences */
-    public static function convertPencesToShillings(int $pences): array
-    {
-        $shillings = intdiv($pences, self::SHILLING_IN_PENCES);
-        $remaining = $pences % self::SHILLING_IN_PENCES;
-        return [$shillings, $remaining];
-    }
-
-
-    public static function convertShillingsToPounds(mixed $shillings): array
-    {
-        $pounds = intdiv($shillings, self::POUND_IN_SHILLING);
-        $remaining = ($shillings % self::POUND_IN_SHILLING) + $shillings[1];
-        return [$pounds, $remaining];
-    }
 
     /**
-     * @param  int  $pounds
-     * @return array    result[0] - Pounds
-     *                  result[1] - Shillings
-     *                  result[2] - pences
+     * This function expects two parameters:
+     *  @param Amount $firstAmount
+     *  @param Amount $secondAmount
      *
+     * @return Amount $sumAmounts The sum with the first amount added to the second one.
      */
-    public static function convertPencesToPoundsCompleteFormat(int $pences): array
+    public static function sumAmounts(Amount $firstAmount, Amount $secondAmount): Amount
     {
-        [$shillings, $pences] = self::convertPencesToShillings($pences);
+        return Amount::sum($firstAmount, $secondAmount);
+    }
 
-        [$pounds, $shillings] = self::convertShillingsToPounds($shillings);
+    public static function subtractAmounts(Amount $firstAmount, Amount $secondAmount): Amount
+    {
+        return Amount::subtraction($firstAmount, $secondAmount);
+    }
 
-        return [$pounds, $shillings, $pences];
+    public static function multiplyAmounts(Amount $amount, int $multiplier): Amount
+    {
+        return Amount::multiplication($amount, $multiplier);
+    }
+
+
+    public static function divideAmount(Amount $amount, int $divider): array
+    {
+        return Amount::division($amount, $divider);
     }
 }
