@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libicu-dev  \
     libonig-dev \
+    libpq-dev \
     libxslt1-dev \
     acl \
     && echo 'alias sf="php bin/console"' >> ~/.bashrc
@@ -22,7 +23,7 @@ RUN apt-get update && apt-get install -y \
 RUN docker-php-ext-configure gd --with-jpeg --with-freetype 
 
 RUN docker-php-ext-install \
-    pdo pdo_mysql zip xsl gd intl opcache exif mbstring
+    pdo pdo_mysql pdo_pgsql zip xsl gd intl opcache exif mbstring
 
 # COPY cert_custom.pem /usr/local/share/ca-certificates/cert_custom.crt
 RUN update-ca-certificates
