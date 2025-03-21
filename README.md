@@ -7,7 +7,7 @@
 Creare un'applicazione tramite l'ausilio del framework Symfony all'interno di un container che esponga API REST, che permettano di:
 1. **Eseguire le principali operazioni aritmetiche**  
    - Somma (5p 17s 8d + 3p 4s 10d = 9p 2s 6d)  
-   - Sottrazione (4p 17s 8d - 3p 17s 10d = 2p 12s 10d)  
+   - Sottrazione (5p 17s 8d - 3p 4s 10d = 2p 12s 10d)  
    - Moltiplicazione con un intero (no decimali) (5p 17s 8d * 2 = 11p 15s 4d)  
    - Divisione resto (tra parentesi) (18p 16s 1d / 15 = 1p 5s 0d) (1s 1d)  
 2. Inserire, modificare e rimuovere articoli da un catalogo (un articolo ha un codice id, nome e costo) - Optional
