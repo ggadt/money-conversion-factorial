@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\ArticleRepository;
+use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: ArticleRepository::class)]
-#[ORM\Table(name: "articles")]
-class Article
+#[ORM\Entity(repositoryClass: ProductRepository::class)]
+#[ORM\Table(name: "products")]
+class Product
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
