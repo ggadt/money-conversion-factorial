@@ -6,6 +6,8 @@ namespace App\Controller\Api\v1;
 
 use App\Controller\BaseApiController;
 use App\Entity\Product;
+use OpenApi\Attributes as OA;
+
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/products')]
+#[OA\Tag(name: 'Products API')]
 class ProductsApiController extends BaseApiController
 {
     private EntityManagerInterface $entityManager;
@@ -28,6 +31,11 @@ class ProductsApiController extends BaseApiController
     }
 
     #[Route('', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Successful response',
+        content: [new \Nelmio\ApiDocBundle\Attribute\Model(type: Product::class)]
+    )]
     public function index(Request $request): Response
     {
         return $this->json($this->entityManager->getRepository(Product::class)->findAll());
@@ -70,6 +78,11 @@ class ProductsApiController extends BaseApiController
     }
 
     #[Route('', methods: ['POST'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Successful response',
+        content: new \Nelmio\ApiDocBundle\Attribute\Model(type: Product::class)
+    )]
     public function create(Request $request): Response
     {
         $product = new Product();
