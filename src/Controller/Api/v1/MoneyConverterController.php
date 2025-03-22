@@ -2,19 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Api\v1;
 
 use App\Models\Amount;
 use App\Service\MoneyConverterService;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
-use OpenApi\Attributes as OA;
 
-#[Route('/api/v1', name: 'api_' ), ]
 class MoneyConverterController extends AbstractController {
 
     public const REGEX_VALIDATION_VALUE = "/([0-9]+)p([0-9]+)s([0-9]+)d/i";
