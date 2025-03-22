@@ -6,19 +6,25 @@ namespace App\Controller\Api\v1;
 
 use App\Controller\BaseApiController;
 use App\Entity\Product;
+use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/products')]
 class ProductsApiController extends BaseApiController
 {
     private EntityManagerInterface $entityManager;
+    private ProductRepository $productRepository;
 
-    public function __construct(EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+    ) {
         $this->entityManager = $entityManager;
+        $this->productRepository = $this->entityManager->getRepository(Product::class);
     }
 
     #[Route('', methods: ['GET'])]
@@ -27,15 +33,40 @@ class ProductsApiController extends BaseApiController
         return $this->json($this->entityManager->getRepository(Product::class)->findAll());
     }
 
-    #[Route('/{id}', methods: ['GET'])]
-    public function findById(Request $request): Response
+    #[Route('/{productId}', methods: ['GET', 'PATCH', 'DELETE'])]
+    public function findById(Request $request, $productId): Response
     {
-        $productId = $request->attributes->get('id');
-
-        if(!$productId) {
+        if (!$productId) {
             return $this->json(['message' => 'You should specify a valid id'], Response::HTTP_BAD_REQUEST);
         }
-        return $this->json($this->entityManager->getRepository(Product::class)->findOneBy(['id' => $productId]));
+
+        $product = $this->productRepository->findOneBy(['id' => $productId]);
+        if (!$product) {
+            throw new NotFoundHttpException();
+        }
+        $response = $product;
+        if ($request->getMethod() == 'PATCH') {
+
+            $title = $request->get('title');
+            if($title) $product->setName($title);
+
+            $price = $request->get('price');
+            if($price) {
+                $price = floatval($price);
+                $product->setPrice($price);
+            }
+
+            $this->entityManager->persist($product);
+            $this->entityManager->flush();
+            $response = ["response" => "Product updated successfully", "product" => $product];
+        } else if ($request->getMethod() == 'DELETE') {
+            $this->entityManager->remove($product);
+
+            $this->entityManager->flush();
+            $response = ["response" => "Product deleted successfully"];
+        }
+
+        return $this->json($response);
     }
 
     #[Route('', methods: ['POST'])]
@@ -48,6 +79,9 @@ class ProductsApiController extends BaseApiController
 
         $this->entityManager->persist($product);
         $this->entityManager->flush();
-        return $this->json(["response" => "Product added successfully! Product: " . $product]);
+        return $this->json([
+            "response" => "Product added successfully!",
+            "product" => $product
+        ]);
     }
 }

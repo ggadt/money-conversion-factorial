@@ -51,6 +51,6 @@ class Product
 
     public function __toString(): string
     {
-        return $this->name . "(price: $this->price $)";
+        return $this->name . " - (price: $this->price $)";
     }
 }
