@@ -40,7 +40,7 @@ class ProductsApiController extends BaseApiController {
         return $this->json($this->productRepository->findAll());
     }
 
-    #[Route('/{product}', methods: ['GET'])]
+    #[Route('/{product<\d+>}', methods: ['GET'])]
     public function findById(Request $request, Product $product): Response {
         return $this->json($product);
     }
@@ -65,7 +65,7 @@ class ProductsApiController extends BaseApiController {
         ], Response::HTTP_CREATED);
     }
 
-    #[Route('/{product}', methods: ['PATCH'])]
+    #[Route('/{product<\d+>}', methods: ['PATCH'])]
     public function update(Request $request, Product $product): Response {
 
         $title = $request->get('title');
@@ -81,7 +81,7 @@ class ProductsApiController extends BaseApiController {
         return $this->json($response);
     }
 
-    #[Route('/{product}', methods: ['DELETE'])]
+    #[Route('/{product<\d+>}', methods: ['DELETE'])]
     public function delete(Request $request, Product $product): Response {
         $this->productRepository->delete($product, true);
         $response = ["response" => "Product deleted successfully"];
