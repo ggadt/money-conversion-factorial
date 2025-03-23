@@ -6,6 +6,7 @@ namespace App\Controller\Api\v1;
 
 use App\Controller\BaseApiController;
 use App\Entity\Product;
+use App\Form\ProductType;
 use OpenApi\Attributes as OA;
 
 use App\Repository\ProductRepository;
@@ -18,7 +19,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/products')]
 #[OA\Tag(name: 'Products API')]
-class ProductsApiController extends BaseApiController {
+class ProductsApiController extends BaseApiController
+{
     private EntityManagerInterface $entityManager;
     private ProductRepository $productRepository;
 
@@ -41,7 +43,8 @@ class ProductsApiController extends BaseApiController {
     }
 
     #[Route('/{product<\d+>}', methods: ['GET'])]
-    public function findById(Request $request, Product $product): Response {
+    public function findById(Request $request, Product $product): Response
+    {
         return $this->json($product);
     }
 
@@ -51,14 +54,20 @@ class ProductsApiController extends BaseApiController {
         description: 'Successful response',
         content: new \Nelmio\ApiDocBundle\Attribute\Model(type: Product::class)
     )]
-    public function create(Request $request): Response
-    {
+    public function create(Request $request): Response {
+        $form = $this->createForm(ProductType::class);
+        $form->submit($request->query->all());
+        if (!$form->isValid()) {
+            return $this->json(["response" => "Fields are not filled correctly.", "errors" => (string) $form->getErrors(true)],
+                Response::HTTP_BAD_REQUEST);
+        }
+
         $product = new Product();
         $product->setName($request->get('name'));
         $price = floatval($request->get('price'));
         $product->setPrice($price);
 
-        $this->productRepository->save($product);
+        $this->productRepository->save($product, true);
         return $this->json([
             "response" => "Product added successfully!",
             "product" => $product
@@ -66,13 +75,16 @@ class ProductsApiController extends BaseApiController {
     }
 
     #[Route('/{product<\d+>}', methods: ['PATCH'])]
-    public function update(Request $request, Product $product): Response {
+    public function update(Request $request, Product $product): Response
+    {
 
-        $title = $request->get('title');
-        if($title) $product->setName($title);
+        $name = $request->get('name');
+        if ($name) {
+            $product->setName($name);
+        }
 
         $price = $request->get('price');
-        if($price) {
+        if ($price) {
             $product->setPrice(floatval($price));
         }
 
@@ -82,7 +94,8 @@ class ProductsApiController extends BaseApiController {
     }
 
     #[Route('/{product<\d+>}', methods: ['DELETE'])]
-    public function delete(Request $request, Product $product): Response {
+    public function delete(Request $request, Product $product): Response
+    {
         $this->productRepository->delete($product, true);
         $response = ["response" => "Product deleted successfully"];
         return $this->json($response);
