@@ -18,8 +18,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/products')]
 #[OA\Tag(name: 'Products API')]
-class ProductsApiController extends BaseApiController
-{
+class ProductsApiController extends BaseApiController {
     private EntityManagerInterface $entityManager;
     private ProductRepository $productRepository;
 
@@ -38,48 +37,17 @@ class ProductsApiController extends BaseApiController
     )]
     public function index(Request $request): Response
     {
-        return $this->json($this->entityManager->getRepository(Product::class)->findAll());
+        return $this->json($this->productRepository->findAll());
     }
 
-    #[Route('/{productId}', methods: ['GET', 'PATCH', 'DELETE'])]
-    public function findById(Request $request, $productId): Response
-    {
-        if (!$productId) {
-            return $this->json(['message' => 'You should specify a valid id'], Response::HTTP_BAD_REQUEST);
-        }
-
-        $product = $this->productRepository->findOneBy(['id' => $productId]);
-        if (!$product) {
-            throw new NotFoundHttpException();
-        }
-        $response = $product;
-        if ($request->getMethod() == 'PATCH') {
-
-            $title = $request->get('title');
-            if($title) $product->setName($title);
-
-            $price = $request->get('price');
-            if($price) {
-                $price = floatval($price);
-                $product->setPrice($price);
-            }
-
-            $this->entityManager->persist($product);
-            $this->entityManager->flush();
-            $response = ["response" => "Product updated successfully", "product" => $product];
-        } else if ($request->getMethod() == 'DELETE') {
-            $this->entityManager->remove($product);
-
-            $this->entityManager->flush();
-            $response = ["response" => "Product deleted successfully"];
-        }
-
-        return $this->json($response);
+    #[Route('/{product}', methods: ['GET'])]
+    public function findById(Request $request, Product $product): Response {
+        return $this->json($product);
     }
 
     #[Route('', methods: ['POST'])]
     #[OA\Response(
-        response: 200,
+        response: 201,
         description: 'Successful response',
         content: new \Nelmio\ApiDocBundle\Attribute\Model(type: Product::class)
     )]
@@ -90,11 +58,33 @@ class ProductsApiController extends BaseApiController
         $price = floatval($request->get('price'));
         $product->setPrice($price);
 
-        $this->entityManager->persist($product);
-        $this->entityManager->flush();
+        $this->productRepository->save($product);
         return $this->json([
             "response" => "Product added successfully!",
             "product" => $product
-        ]);
+        ], Response::HTTP_CREATED);
+    }
+
+    #[Route('/{product}', methods: ['PATCH'])]
+    public function update(Request $request, Product $product): Response {
+
+        $title = $request->get('title');
+        if($title) $product->setName($title);
+
+        $price = $request->get('price');
+        if($price) {
+            $product->setPrice(floatval($price));
+        }
+
+        $this->productRepository->save($product, true);
+        $response = ["response" => "Product updated successfully", "product" => $product];
+        return $this->json($response);
+    }
+
+    #[Route('/{product}', methods: ['DELETE'])]
+    public function delete(Request $request, Product $product): Response {
+        $this->productRepository->delete($product, true);
+        $response = ["response" => "Product deleted successfully"];
+        return $this->json($response);
     }
 }

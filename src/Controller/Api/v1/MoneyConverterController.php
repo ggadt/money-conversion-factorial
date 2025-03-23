@@ -17,7 +17,7 @@ class MoneyConverterController extends AbstractController {
 
     public const REGEX_VALIDATION_VALUE = "/([0-9]+)p([0-9]+)s([0-9]+)d/i";
 
-    #[Route('/sum', methods: ['GET'], name: 'sum')]
+    #[Route('/sum', name: 'sum', methods: ['GET'])]
     #[OA\Response(
         response: 200,
         description: 'Returns the sum of two amounts',
