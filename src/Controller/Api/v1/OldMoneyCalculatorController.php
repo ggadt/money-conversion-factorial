@@ -45,12 +45,10 @@ class OldMoneyCalculatorController extends AbstractController {
         schema: new OA\Schema(type: 'string')
     )]
     public function addition(
-        Request $request,
-        ValidatorInterface $validator,
         #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $firstValue,
         #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $secondValue,
     ): JsonResponse {
-
+        /*
         //$form = $this->createForm(MoneyConverterType::class);
         //foreach ([$firstValue => "firstValue", $secondValue => "secondValue"] as $var => $str) {
         //    $errors = $validator->validate($var, [
@@ -67,7 +65,7 @@ class OldMoneyCalculatorController extends AbstractController {
         //$form->submit($request->query->all());
         //if (!$form->isValid())
         //    throw new BadRequestHttpException();
-
+        */
         $firstAmount = Amount::fromString($firstValue);
         $secondAmount = Amount::fromString($secondValue);
 
@@ -84,7 +82,6 @@ class OldMoneyCalculatorController extends AbstractController {
         #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $firstValue,
         #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $secondValue,
     ): JsonResponse {
-
         $firstAmount = Amount::fromString($firstValue);
         $secondAmount = Amount::fromString($secondValue);
 
@@ -99,8 +96,11 @@ class OldMoneyCalculatorController extends AbstractController {
     #[Route('/multiplication', methods: ['GET'])]
     public function multiplication(
         #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $firstValue,
-        #[MapQueryParameter] int $multiplier,
+        #[MapQueryParameter(filter: \FILTER_VALIDATE_INT, options: ['min_range' => 0])] int $multiplier,
     ): JsonResponse {
+
+
+
         $firstAmount = Amount::fromString($firstValue);
 
         return $this->json([
@@ -114,7 +114,7 @@ class OldMoneyCalculatorController extends AbstractController {
     #[Route('/division', methods: ['GET'])]
     public function division(
         #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $firstValue,
-        #[MapQueryParameter] int $divider,
+        #[MapQueryParameter(filter: \FILTER_VALIDATE_INT, options: ['min_range' => 0])] int $divider,
     ): JsonResponse {
         $firstAmount = Amount::fromString($firstValue);
 
