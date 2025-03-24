@@ -100,10 +100,22 @@ class OldMoneyCalculatorController extends AbstractController {
      */
     #[Route('/multiplication', methods: ['GET'])]
     public function multiplication(
+        ValidatorInterface $validator,
         #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $firstValue,
-        #[MapQueryParameter(filter: \FILTER_VALIDATE_INT, options: ['min_range' => 0])] int $multiplier,
+        #[MapQueryParameter] int $multiplier,
     ): JsonResponse {
         $firstAmount = Amount::fromString($firstValue);
+
+        // Asserting that multiplier is eq or greather than 0
+        $errors = $validator->validate($multiplier, [
+            new Assert\NotBlank(),
+            new Assert\NotNull(),
+            new Assert\PositiveOrZero()
+        ]);
+
+        if (count($errors) > 0) {
+            return new JsonResponse(["error" => "Error on validation of multiplier: $multiplier", "errors" => (string) $errors], 400);
+        }
 
         return $this->json([
             "result" => (string) MoneyConverterService::multiplyAmounts($firstAmount, $multiplier),
@@ -115,11 +127,22 @@ class OldMoneyCalculatorController extends AbstractController {
      */
     #[Route('/division', methods: ['GET'])]
     public function division(
+        ValidatorInterface $validator,
         #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $firstValue,
-        #[MapQueryParameter(filter: \FILTER_VALIDATE_INT, options: ['min_range' => 0])] int $divider,
+        #[MapQueryParameter] int $divider,
     ): JsonResponse {
         $firstAmount = Amount::fromString($firstValue);
 
+        // Asserting that divider is greather than 0
+        $errors = $validator->validate($divider, [
+            new Assert\NotBlank(),
+            new Assert\NotNull(),
+            new Assert\Positive()
+        ]);
+
+        if (count($errors) > 0) {
+            return new JsonResponse(["error" => "Error on validation of divider: $divider", "errors" => (string) $errors], 400);
+        }
         return $this->json([
             "result" => (string) MoneyConverterService::divideAmount($firstAmount, $divider)[0],
             "remainder" =>(string) MoneyConverterService::divideAmount($firstAmount, $divider)[1],
