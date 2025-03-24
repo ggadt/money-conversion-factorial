@@ -17,6 +17,7 @@ N.B.: Gli endpoint devono poter ricevere e produrre i valori monetari come strin
 Nel caso della divisione, se è presente un resto, questo sarà indicato tra parentesi usando stesso formato.
 
 ## Requirements
+
 - Utilizzo framework symfony
 - Esposizione chiamate REST
 - Utilizzo containerizzazione con Docker

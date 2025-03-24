@@ -44,10 +44,28 @@ Assunto che:
 
 ### GET /sum 
 
-- Examples
+- Parametri query
+    - 1° valore - addendo 1 (firstValue)
+    - 2° valore - addendo 2 (secondValue)
+      Formato parametri: stringa (XpYsZd) (vedi validazione #1)
+  
+- Request example
   - /sum?firstValue=5p17s8d&secondValue=3p4s10d
 
+- Response example
+  - `{result: '9p2s6d'}`
+
 ### GET /subtraction
+
+- Parametri query
+    - 1° valore
+    - 2° valore
+      Formato parametri: stringa (XpYsZd) (vedi validazione #1)
+
+- Risposta
+    - stringa nel seguente formato: XpYsZd
+
+
 ### GET /multiplication
 
   - Parametri query
@@ -59,8 +77,7 @@ Assunto che:
     - stringa nel seguente formato: XpYsZd
 
 ### GET /division
-    - Risposta
-    - stringa nel seguente formato: XpYsZd (in base al caso, potrà esser inserito il seguente valore: (XpYsZd)
+- stringa nel seguente formato: XpYsZd 
 
 ---
 
@@ -88,7 +105,7 @@ Lo swagger delle API realizzate è raggiungibile al seguente indirizzo:
 
 ### Validazione  
 1. Il parametro deve rispettare la seguente espressione regolare:
-    - ^[0-9+]p[0-9+]s[0-9+]d$/i
+    - ^[0-9+]p[0-9+]s[0-9+]d$/i (es. **10p5s1d**)
       - il gruppo [0-9+] indica che può essere inserita una qualsiasi cifra intera compresa tra 0 e 9 da 1 a n volte
       - l'espressione regolare può essere inserita anche in case insensitive (es. 'P' o 'p', 'S' o 's' ecc.)
       - La stringa inserita deve iniziare con una cifra e terminare con il carattere 'd', mantenendo la struttura definita su

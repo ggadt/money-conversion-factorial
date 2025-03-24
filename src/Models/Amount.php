@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use Exception;
+
 class Amount {
+    public const REGEX_VALIDATION_VALUE = "/^([0-9]+)p([0-9]+)s([0-9]+)d$/i";
 
     const POUND_IN_SHILLING = 20;
     const SHILLING_IN_PENCES = 12;
@@ -12,11 +15,37 @@ class Amount {
     protected int $shillings;
     protected int $pences;
 
+    /**
+     * @throws Exception
+     */
     public function __construct(int $pounds, int $shillings, int $pences) {
+        // [int](pP)[int](sS)[int](dD)
+
         $this->pounds = $pounds;
         $this->shillings = $shillings;
         $this->pences = $pences;
     }
+
+    /**
+     * @throws Exception
+     */
+    public static function fromString(string $amount): Amount {
+
+        // Validate if the string matches the structure.
+        if(!preg_match(self::REGEX_VALIDATION_VALUE, $amount, $valueMatches)) {
+            throw new Exception("Amount string not valid: " . $amount);
+        }
+
+        [$echoString, $pounds, $shillings, $pences] = $valueMatches;
+
+        // Conversion from strings already validated into integers
+        $pounds = intval($pounds);
+        $shillings = intval($shillings);
+        $pences = intval($pences);
+
+        return new Amount($pounds, $shillings, $pences);
+    }
+
 
     // It has been evaluated that it is not necessary for this use case to create a method that belongs to the amount class,
     // hence i've created static methods like a calculator

@@ -7,20 +7,26 @@ namespace App\Controller\Api\v1;
 use App\Form\MoneyConverterType;
 use App\Models\Amount;
 use App\Service\MoneyConverterService;
+use App\Validator\IsValidAmount;
+use Exception;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator as CustomValidators;
 
 #[OA\Tag(name: 'Old Money System Calculator APIs')]
 class OldMoneyCalculatorController extends AbstractController {
 
-    public const REGEX_VALIDATION_VALUE = "/^([0-9]+)p([0-9]+)s([0-9]+)d$/i";
-
+    /**
+     * @throws Exception
+     */
     #[Route('/sum', name: 'sum', methods: ['GET'])]
     #[OA\Response(
         response: 200,
@@ -41,201 +47,81 @@ class OldMoneyCalculatorController extends AbstractController {
     public function addition(
         Request $request,
         ValidatorInterface $validator,
-        #[MapQueryParameter] string $firstValue,
-        #[MapQueryParameter] string $secondValue,
+        #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $firstValue,
+        #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $secondValue,
     ): JsonResponse {
-        //TODO: check that the query parameters are not empty, that the structure is the following:
 
-        $form = $this->createForm(MoneyConverterType::class);
-        $errors = $validator->validate($firstValue, [
-            new Assert\NotBlank(),
+        //$form = $this->createForm(MoneyConverterType::class);
+        //foreach ([$firstValue => "firstValue", $secondValue => "secondValue"] as $var => $str) {
+        //    $errors = $validator->validate($var, [
+        //        new Assert\NotBlank(),
+        //        new Assert\NotNull(),
+        //        new CustomValidators\IsValidAmount()
+        //    ]);
+
+        //    if (count($errors) > 0) {
+        //        return new JsonResponse(["error" => "Error on validation of field $str", "errors" => (string) $errors], 400);
+        //    }
+        //}
+
+        //$form->submit($request->query->all());
+        //if (!$form->isValid())
+        //    throw new BadRequestHttpException();
+
+        $firstAmount = Amount::fromString($firstValue);
+        $secondAmount = Amount::fromString($secondValue);
+
+        return $this->json([
+            "result" => (string) MoneyConverterService::sumAmounts($firstAmount, $secondAmount),
         ]);
-
-        if (count($errors) > 0) {
-            return new Response((string) $errors, 400);
-        }
-
-        $form->submit($request->query->all());
-        if (!$form->isValid())
-            throw new BadRequestHttpException();
-        // [int](pP)[int](sS)[int](dD)
-
-        $firstValueMatches = [];
-        $secondValueMatches = [];
-
-        // Validate if the string matches the structure.
-        $firstRegexMatch = preg_match(self::REGEX_VALIDATION_VALUE, $firstValue, $firstValueMatches);
-        $secondRegexMatch = preg_match(self::REGEX_VALIDATION_VALUE, $secondValue, $secondValueMatches);
-
-        //TODO: Assert that the firstValueMatches and secondValueMatches has 4 values respectively.
-        [$echoString, $poundsFirstValue, $shillingsFirstValue, $pencesFirstValue] = $firstValueMatches;
-        [$echoString, $poundsSecondValue, $shillingsSecondValue, $pencesSecondValue] = $secondValueMatches;
-
-        // Conversion from strings already validated into integers
-        $poundsFirstValue = intval($poundsFirstValue);
-        $shillingsFirstValue = intval($shillingsFirstValue);
-        $pencesFirstValue = intval($pencesFirstValue);
-        $poundsSecondValue = intval($poundsSecondValue);
-        $shillingsSecondValue = intval($shillingsSecondValue);
-        $pencesSecondValue = intval($pencesSecondValue);
-
-
-        $firstAmount = new Amount($poundsFirstValue, $shillingsFirstValue, $pencesFirstValue);
-        $secondAmount = new Amount($poundsSecondValue, $shillingsSecondValue, $pencesSecondValue);
-
-        return $this->json(
-            [
-                "result" => MoneyConverterService::sumAmounts($firstAmount, $secondAmount)->__toString(),
-            ]
-        );
-
-        /*
-         *
-                "firstValueDestructured" => [
-                    "Pounds" => $poundsFirstValue,
-                    "Shillings" => $shillingsFirstValue,
-                    "Pences" => $pencesFirstValue,
-                ],
-                "secondValueDestructured" => [
-                    "Pounds" => $poundsSecondValue,
-                    "Shillings" => $shillingsSecondValue,
-                    "Pences" => $pencesSecondValue,
-                ]
-         */
     }
 
+    /**
+     * @throws Exception
+     */
     #[Route('/subtraction', methods: ['GET'])]
     public function subtraction(
-        #[MapQueryParameter] string $firstValue,
-        #[MapQueryParameter] string $secondValue,
+        #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $firstValue,
+        #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $secondValue,
     ): JsonResponse {
 
-        $firstValueMatches = [];
-        $secondValueMatches = [];
+        $firstAmount = Amount::fromString($firstValue);
+        $secondAmount = Amount::fromString($secondValue);
 
-        // Validate if the string matches the structure.
-        $firstRegexMatch = preg_match(self::REGEX_VALIDATION_VALUE, $firstValue, $firstValueMatches);
-        $secondRegexMatch = preg_match(self::REGEX_VALIDATION_VALUE, $secondValue, $secondValueMatches);
-
-        //TODO: Assert that the firstValueMatches and secondValueMatches has 4 values respectively.
-        [$echoString, $poundsFirstValue, $shillingsFirstValue, $pencesFirstValue] = $firstValueMatches;
-        [$echoString, $poundsSecondValue, $shillingsSecondValue, $pencesSecondValue] = $secondValueMatches;
-
-        // Conversion from strings already validated into integers
-        $poundsFirstValue = intval($poundsFirstValue);
-        $shillingsFirstValue = intval($shillingsFirstValue);
-        $pencesFirstValue = intval($pencesFirstValue);
-        $poundsSecondValue = intval($poundsSecondValue);
-        $shillingsSecondValue = intval($shillingsSecondValue);
-        $pencesSecondValue = intval($pencesSecondValue);
-
-        $firstAmount = new Amount($poundsFirstValue, $shillingsFirstValue, $pencesFirstValue);
-        $secondAmount = new Amount($poundsSecondValue, $shillingsSecondValue, $pencesSecondValue);
-
-        return $this->json(
-            [
-                "result" => MoneyConverterService::subtractAmounts($firstAmount, $secondAmount)->__toString(),
-            ]
-        );
-
-        /*
-         *
-                "firstValueDestructured" => [
-                    "Pounds" => $poundsFirstValue,
-                    "Shillings" => $shillingsFirstValue,
-                    "Pences" => $pencesFirstValue,
-                ],
-                "secondValueDestructured" => [
-                    "Pounds" => $poundsSecondValue,
-                    "Shillings" => $shillingsSecondValue,
-                    "Pences" => $pencesSecondValue,
-                ]
-         */
+        return $this->json([
+            "result" => (string) MoneyConverterService::subtractAmounts($firstAmount, $secondAmount),
+        ]);
     }
 
+    /**
+     * @throws Exception
+     */
     #[Route('/multiplication', methods: ['GET'])]
     public function multiplication(
-        #[MapQueryParameter] string $firstValue,
+        #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $firstValue,
         #[MapQueryParameter] int $multiplier,
     ): JsonResponse {
+        $firstAmount = Amount::fromString($firstValue);
 
-        $firstValueMatches = [];
-
-        // Validate if the string matches the structure.
-        $firstRegexMatch = preg_match(self::REGEX_VALIDATION_VALUE, $firstValue, $firstValueMatches);
-
-        //TODO: Assert that the firstValueMatches and secondValueMatches has 4 values respectively.
-        [$echoString, $poundsFirstValue, $shillingsFirstValue, $pencesFirstValue] = $firstValueMatches;
-
-        // Conversion from strings already validated into integers
-        $poundsFirstValue = intval($poundsFirstValue);
-        $shillingsFirstValue = intval($shillingsFirstValue);
-        $pencesFirstValue = intval($pencesFirstValue);
-
-        $firstAmount = new Amount($poundsFirstValue, $shillingsFirstValue, $pencesFirstValue);
-
-        return $this->json(
-            [
-                "result" => MoneyConverterService::multiplyAmounts($firstAmount, $multiplier)->__toString(),
-            ]
-        );
-
-        /*
-         *
-                "firstValueDestructured" => [
-                    "Pounds" => $poundsFirstValue,
-                    "Shillings" => $shillingsFirstValue,
-                    "Pences" => $pencesFirstValue,
-                ],
-                "secondValueDestructured" => [
-                    "Pounds" => $poundsSecondValue,
-                    "Shillings" => $shillingsSecondValue,
-                    "Pences" => $pencesSecondValue,
-                ]
-         */
+        return $this->json([
+            "result" => (string) MoneyConverterService::multiplyAmounts($firstAmount, $multiplier),
+        ]);
     }
 
+    /**
+     * @throws Exception
+     */
     #[Route('/division', methods: ['GET'])]
     public function division(
-        #[MapQueryParameter] string $firstValue,
+        #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $firstValue,
         #[MapQueryParameter] int $divider,
     ): JsonResponse {
+        $firstAmount = Amount::fromString($firstValue);
 
-        $firstValueMatches = [];
-
-        // Validate if the string matches the structure.
-        $firstRegexMatch = preg_match(self::REGEX_VALIDATION_VALUE, $firstValue, $firstValueMatches);
-
-        //TODO: Assert that the firstValueMatches and secondValueMatches has 4 values respectively.
-        [$echoString, $poundsFirstValue, $shillingsFirstValue, $pencesFirstValue] = $firstValueMatches;
-
-        // Conversion from strings already validated into integers
-        $poundsFirstValue = intval($poundsFirstValue);
-        $shillingsFirstValue = intval($shillingsFirstValue);
-        $pencesFirstValue = intval($pencesFirstValue);
-
-        $firstAmount = new Amount($poundsFirstValue, $shillingsFirstValue, $pencesFirstValue);
-
-        return $this->json(
-            [
-                "result" => MoneyConverterService::divideAmount($firstAmount, $divider)[0]->__toString(),
-                "remainder" => MoneyConverterService::divideAmount($firstAmount, $divider)[1]->__toString(),
-            ]
-        );
-
-        /*
-         *
-                "firstValueDestructured" => [
-                    "Pounds" => $poundsFirstValue,
-                    "Shillings" => $shillingsFirstValue,
-                    "Pences" => $pencesFirstValue,
-                ],
-                "secondValueDestructured" => [
-                    "Pounds" => $poundsSecondValue,
-                    "Shillings" => $shillingsSecondValue,
-                    "Pences" => $pencesSecondValue,
-                ]
-         */
+        return $this->json([
+            "result" => (string) MoneyConverterService::divideAmount($firstAmount, $divider)[0],
+            "remainder" =>(string) MoneyConverterService::divideAmount($firstAmount, $divider)[1],
+        ]);
     }
 
 }
