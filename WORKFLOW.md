@@ -1,19 +1,35 @@
 # Workflow
 
-Il seguente documento include il ragionamento eseguito per ottenere la soluzione alla problematica.
+Il seguente documento include note di brainstorming, e il ragionamento eseguito per ottenere la soluzione alla problematica.
+
+## Necessità
+- Container docker che espone API REST (caricare su dockerhub)
+- API REST OldMoneyCalculator 
+- Utilizzo framework symfony
+
+### Bassa priorità
+- Test
+- swagger
+- API REST Products
+
+
+## Assunzioni
 
 Assunto che:
 - il carattere 'p' sia relativo ai pound
 - il carattere 's' sia relativo agli shilling
 - il carattere 'd' sia relativo ai pence
-  
 
 - Un 'p' equivale a 20 's', e v.v.
 - Un 's' equivale a 12 'd', e v.v.  
 
+- 's' sarà sempre compreso fra 0 e 19 (negli input e output)
+- 'd' sarà sempre compreso fra 0 e 11 (negli input e output)
 
-- 's' sarà sempre compreso fra 0 e 19,
-- 'd' sarà sempre compreso fra 0 e 11,
+- i parametri di input e output non conterranno spazi di divisione; es:
+  - NO: 5p 2s 4d
+  - SI 5p2s4d
+- Nelle API REST i parametri devono essere specificati e in un formato valido (vedi seguente)
 
 
 ## Algoritmo risolutivo per le varie operazioni
@@ -22,6 +38,7 @@ Assunto che:
 - Effettuare l'operazione matematica
 - Riconvertire il risultato in P, S, D 
 
+---
 
 # Endpoints
 
@@ -44,4 +61,35 @@ Assunto che:
 ### GET /division
     - Risposta
     - stringa nel seguente formato: XpYsZd (in base al caso, potrà esser inserito il seguente valore: (XpYsZd)
+
+---
+
+# Swagger
+
+Lo swagger delle API realizzate è raggiungibile al seguente indirizzo:
+`localhost:<porta>/api/doc`
+
+
+---
+
+## Test
+
+- L'operatore somma deve prendere in input due stringhe che rispettino la validazione #1
+- L'operatore somma, date due stringhe valide, restituisce in output una stringa nel formato valido
+
+- L'operatore sottrazione deve prendere in input due stringhe che rispettino la validazione #1
+- L'operatore sottrazione, date due stringhe valide, restituisce in output una stringa nel formato valido
+
+- L'operatore moltiplicazione deve prendere in input una stringa che rispetti la validazione #1 e un intero (moltiplicatore)
+- L'operatore moltiplicazione, date due stringhe valide, restituisce in output una stringa nel formato valido
+
+- L'operatore divisione deve prendere in input una stringa che rispetti la validazione #1 e un intero (divisore)
+- L'operatore divisione, date due stringhe valide, restituisce in output due stringhe nel formato valido (quoziente e resto)
+
+### Validazione  
+1. Il parametro deve rispettare la seguente espressione regolare:
+    - ^[0-9+]p[0-9+]s[0-9+]d$/i
+      - il gruppo [0-9+] indica che può essere inserita una qualsiasi cifra intera compresa tra 0 e 9 da 1 a n volte
+      - l'espressione regolare può essere inserita anche in case insensitive (es. 'P' o 'p', 'S' o 's' ecc.)
+      - La stringa inserita deve iniziare con una cifra e terminare con il carattere 'd', mantenendo la struttura definita su
 

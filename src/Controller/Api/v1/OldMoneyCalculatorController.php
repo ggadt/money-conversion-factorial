@@ -14,11 +14,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[OA\Tag(name: 'Old Money System Calculator APIs')]
 class OldMoneyCalculatorController extends AbstractController {
 
-    public const REGEX_VALIDATION_VALUE = "/([0-9]+)p([0-9]+)s([0-9]+)d/i";
+    public const REGEX_VALIDATION_VALUE = "/^([0-9]+)p([0-9]+)s([0-9]+)d$/i";
 
     #[Route('/sum', name: 'sum', methods: ['GET'])]
     #[OA\Response(
@@ -39,14 +40,23 @@ class OldMoneyCalculatorController extends AbstractController {
     )]
     public function addition(
         Request $request,
+        ValidatorInterface $validator,
         #[MapQueryParameter] string $firstValue,
         #[MapQueryParameter] string $secondValue,
     ): JsonResponse {
         //TODO: check that the query parameters are not empty, that the structure is the following:
 
         $form = $this->createForm(MoneyConverterType::class);
+        $errors = $validator->validate($firstValue, [
+            new Assert\NotBlank(),
+        ]);
+
+        if (count($errors) > 0) {
+            return new Response((string) $errors, 400);
+        }
+
         $form->submit($request->query->all());
-        if(!$form->isValid())
+        if (!$form->isValid())
             throw new BadRequestHttpException();
         // [int](pP)[int](sS)[int](dD)
 
