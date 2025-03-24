@@ -32,8 +32,8 @@ class Amount {
     public static function fromString(string $amount): Amount {
 
         // Validate if the string matches the structure.
-        if(!preg_match(self::REGEX_VALIDATION_VALUE, $amount, $valueMatches)) {
-            throw new Exception("Amount string not valid: " . $amount);
+        if (!preg_match(self::REGEX_VALIDATION_VALUE, $amount, $valueMatches)) {
+            throw new Exception("Amount string not valid: ".$amount);
         }
 
         [$echoString, $pounds, $shillings, $pences] = $valueMatches;
@@ -50,15 +50,13 @@ class Amount {
     // It has been evaluated that it is not necessary for this use case to create a method that belongs to the amount class,
     // hence i've created static methods like a calculator
 
-    public static function sum(Amount $firstAmount, Amount $secondAmount) : Amount
-    {
+    public static function sum(Amount $firstAmount, Amount $secondAmount): Amount {
         $firstAmountInPences = $firstAmount->convertAmountToPences();
         $secondAmountInPences = $secondAmount->convertAmountToPences();
         return self::convertPencesToAmount($firstAmountInPences + $secondAmountInPences);
     }
 
-    public static function subtraction(Amount $firstAmount, Amount $secondAmount) : Amount
-    {
+    public static function subtraction(Amount $firstAmount, Amount $secondAmount): Amount {
         $firstAmountInPences = $firstAmount->convertAmountToPences();
         $secondAmountInPences = $secondAmount->convertAmountToPences();
 
@@ -66,8 +64,7 @@ class Amount {
     }
 
     // As the assignment requires, the multiplication should be done with an integer
-    public static function multiplication(Amount $firstAmount, int $integer) : Amount
-    {
+    public static function multiplication(Amount $firstAmount, int $integer): Amount {
         $firstAmountInPences = $firstAmount->convertAmountToPences();
 
         return self::convertPencesToAmount($firstAmountInPences * $integer);
@@ -80,7 +77,7 @@ class Amount {
      * @param  int  $integer
      * @return array it returns an array of two values, the first is the integer part, and the second one is the remainder
      */
-    public static function division(Amount $firstAmount, int $integer) : array {
+    public static function division(Amount $firstAmount, int $integer): array {
         $firstAmountInPences = $firstAmount->convertAmountToPences();
 
         return [
@@ -90,7 +87,7 @@ class Amount {
     }
 
     public function convertAmountToPences(): int {
-       return self::convertPoundsToPences($this->pounds) + self::convertShillingsToPences($this->shillings) + $this->pences;
+        return self::convertPoundsToPences($this->pounds) + self::convertShillingsToPences($this->shillings) + $this->pences;
     }
 
     public static function convertPoundsToPences(int $pounds): int {
@@ -107,16 +104,14 @@ class Amount {
     }
 
     /** Return an array in which the first value is the shillings, and the other is the remaining part in pences */
-    public static function convertPencesToShillings(int $pences): array
-    {
+    public static function convertPencesToShillings(int $pences): array {
         $shillings = intdiv($pences, self::SHILLING_IN_PENCES);
         $remaining = $pences % self::SHILLING_IN_PENCES;
         return [$shillings, $remaining];
     }
 
 
-    public static function convertShillingsToPounds($shillings): array
-    {
+    public static function convertShillingsToPounds($shillings): array {
         $pounds = intdiv($shillings, self::POUND_IN_SHILLING);
         $remaining = $shillings % self::POUND_IN_SHILLING;
         return [$pounds, $remaining];
@@ -138,8 +133,7 @@ class Amount {
         return new Amount($pounds, $shillings, $pences);
     }
 
-    public function __toString(): string
-    {
-        return $this->pounds . 'p' . $this->shillings . 's' . $this->pences . 'd';
+    public function __toString(): string {
+        return $this->pounds.'p'.$this->shillings.'s'.$this->pences.'d';
     }
 }

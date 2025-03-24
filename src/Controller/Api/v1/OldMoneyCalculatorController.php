@@ -85,6 +85,11 @@ class OldMoneyCalculatorController extends AbstractController {
         $firstAmount = Amount::fromString($firstValue);
         $secondAmount = Amount::fromString($secondValue);
 
+        if($firstAmount < $secondAmount) {
+            throw new BadRequestHttpException('The first amount is less than the second, operation not permitted.
+             You cannot subtract money an import of money greater than the first, or you risk debt!');
+        }
+
         return $this->json([
             "result" => (string) MoneyConverterService::subtractAmounts($firstAmount, $secondAmount),
         ]);
@@ -98,9 +103,6 @@ class OldMoneyCalculatorController extends AbstractController {
         #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $firstValue,
         #[MapQueryParameter(filter: \FILTER_VALIDATE_INT, options: ['min_range' => 0])] int $multiplier,
     ): JsonResponse {
-
-
-
         $firstAmount = Amount::fromString($firstValue);
 
         return $this->json([
