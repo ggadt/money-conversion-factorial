@@ -2,24 +2,25 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Api\v1;
 
+use App\Form\MoneyConverterType;
 use App\Models\Amount;
 use App\Service\MoneyConverterService;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
-use OpenApi\Attributes as OA;
 
-#[Route('/api/v1', name: 'api_' ), ]
-class MoneyConverterController extends AbstractController {
+#[OA\Tag(name: 'Old Money System Calculator APIs')]
+class OldMoneyCalculatorController extends AbstractController {
 
     public const REGEX_VALIDATION_VALUE = "/([0-9]+)p([0-9]+)s([0-9]+)d/i";
 
-    #[Route('/sum', methods: ['GET'], name: 'sum')]
+    #[Route('/sum', name: 'sum', methods: ['GET'])]
     #[OA\Response(
         response: 200,
         description: 'Returns the sum of two amounts',
@@ -37,11 +38,16 @@ class MoneyConverterController extends AbstractController {
         schema: new OA\Schema(type: 'string')
     )]
     public function addition(
+        Request $request,
         #[MapQueryParameter] string $firstValue,
         #[MapQueryParameter] string $secondValue,
     ): JsonResponse {
         //TODO: check that the query parameters are not empty, that the structure is the following:
 
+        $form = $this->createForm(MoneyConverterType::class);
+        $form->submit($request->query->all());
+        if(!$form->isValid())
+            throw new BadRequestHttpException();
         // [int](pP)[int](sS)[int](dD)
 
         $firstValueMatches = [];
