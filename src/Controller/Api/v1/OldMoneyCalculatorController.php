@@ -21,28 +21,29 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Validator as CustomValidators;
 
-#[OA\Tag(name: 'Old Money System Calculator APIs')]
+#[OA\Tag(name: 'Old Money System Calculator APIs', description: "These APIs calculates the basic mathematical operations with an old money system.")]
 class OldMoneyCalculatorController extends AbstractController {
 
     /**
      * @throws Exception
      */
     #[Route('/sum', name: 'sum', methods: ['GET'])]
+    #[OA\Get(summary: 'Computes the sum between two amounts.')]
     #[OA\Response(
         response: 200,
         description: 'Returns the sum of two amounts',
     )]
     #[OA\Parameter(
         name: 'firstValue',
-        description: 'The first value of the amount to be sum',
+        description: 'The first value of the amount to be sum. SHOULD respect the format XpYsZd, where X, Y, and Z are integers.',
         in: 'query',
-        schema: new OA\Schema(type: 'string')
+        schema: new OA\Schema(type: 'string', example: "1p6s3d")
     )]
     #[OA\Parameter(
         name: 'secondValue',
-        description: 'The second value of the amount to be sum to the first',
+        description: 'The second value of the amount to be sum to the first. SHOULD respect the format XpYsZd, where X, Y, and Z are integers.',
         in: 'query',
-        schema: new OA\Schema(type: 'string')
+        schema: new OA\Schema(type: 'string', example: "5p6s4d")
     )]
     public function addition(
         #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $firstValue,
@@ -78,6 +79,23 @@ class OldMoneyCalculatorController extends AbstractController {
      * @throws Exception
      */
     #[Route('/subtraction', methods: ['GET'])]
+    #[OA\Get(summary: 'Computes the subtraction between two amounts')]
+    #[OA\Parameter(
+        name: 'firstValue',
+        description: 'The first value of the amount for the subtraction. SHOULD respect the format XpYsZd, where X, Y, and Z are integers.',
+        in: 'query',
+        schema: new OA\Schema(type: 'string', example: "1p6s3d")
+    )]
+    #[OA\Parameter(
+        name: 'secondValue',
+        description: 'The second value of the amount to be subtracted to the first. SHOULD respect the format XpYsZd, where X, Y, and Z are integers.',
+        in: 'query',
+        schema: new OA\Schema(type: 'string', example: "1p6s3d")
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Returns the subtraction of two amounts',
+    )]
     public function subtraction(
         #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $firstValue,
         #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $secondValue,
@@ -99,6 +117,23 @@ class OldMoneyCalculatorController extends AbstractController {
      * @throws Exception
      */
     #[Route('/multiplication', methods: ['GET'])]
+    #[OA\Get(summary: 'Computes the multiplication between an amount and an integer.')]
+    #[OA\Parameter(
+        name: 'firstValue',
+        description: 'The value of the amount to be multiplied with an integer. SHOULD respect the format XpYsZd, where X, Y, and Z are integers.',
+        in: 'query',
+        schema: new OA\Schema(type: 'string', example: "1p6s3d")
+    )]
+    #[OA\Parameter(
+        name: 'multiplier',
+        description: 'An integer that will be multiplied with the amount.',
+        in: 'query',
+        schema: new OA\Schema(type: 'integer', example: "23")
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Returns the multiplication of two amounts',
+    )]
     public function multiplication(
         ValidatorInterface $validator,
         #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $firstValue,
@@ -126,6 +161,23 @@ class OldMoneyCalculatorController extends AbstractController {
      * @throws Exception
      */
     #[Route('/division', methods: ['GET'])]
+    #[OA\Get(summary: 'Computes the division between an amount and an integer.')]
+    #[OA\Parameter(
+        name: 'firstValue',
+        description: 'The value of the amount to be divided with an integer. SHOULD respect the format XpYsZd, where X, Y, and Z are integers.',
+        in: 'query',
+        schema: new OA\Schema(type: 'string', example: "1p6s3d")
+    )]
+    #[OA\Parameter(
+        name: 'divider',
+        description: 'An integer that will be divided with the amount.',
+        in: 'query',
+        schema: new OA\Schema(type: 'integer', example: "5")
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Returns the division of two amounts and the rest of the division.',
+    )]
     public function division(
         ValidatorInterface $validator,
         #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $firstValue,

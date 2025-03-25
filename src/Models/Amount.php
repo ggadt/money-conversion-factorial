@@ -5,7 +5,7 @@ namespace App\Models;
 use Exception;
 
 class Amount {
-    public const REGEX_VALIDATION_VALUE = "/^([0-9]+)p([0-9]+)s([0-9]+)d$/i";
+public const REGEX_VALIDATION_VALUE = "/^([0-9]++)p([0-9]++)s([0-9]++)d$/i";
 
     const POUND_IN_SHILLING = 20;
     const SHILLING_IN_PENCES = 12;
