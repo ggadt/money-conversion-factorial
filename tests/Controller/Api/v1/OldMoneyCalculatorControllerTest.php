@@ -3,58 +3,63 @@
 namespace App\Tests\Controller\Api\v1;
 
 
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class OldMoneyCalculatorControllerTest extends TestCase {
 
     protected $baseUrl = '/api/v1/oldMoneyCalculator';
+    protected $client;
 
-
-    //  // Test: Somma di numeri
-
-    /**
-     * @throws GuzzleException
-     */
-    public function testAddMoney(): void {
-        $client = new \GuzzleHttp\Client([
+    function setUp(): void {
+        $this->client = new Client([
             'base_uri' => 'http://nginx',
             'defaults' => [
                 'exceptions' => true
             ]
         ]);
+    }
+    protected function tearDown(): void {
+        $this->client = null;
+    }
 
-        // Somma di due valori monetari
-        $response = $client->get($this->baseUrl.'/sum', [
+    /**
+     * @throws GuzzleException
+     */
+    public function testAddMoney(): void {
+
+        $response = $this->client->get($this->baseUrl.'/sum', [
             "query" => [
                 'firstValue' => '5p17s8d',
                 'secondValue' => '3p4s10d',
             ]
         ]);
-//
-        $this->assertEquals(200, $response->getStatusCode());
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertJsonResponse($response->getBody(), [
             'result' => '9p2s6d',
         ]);
     }
-//
-    //  // Test: Sottrazione di numeri
-    //  public function testSubtractMoney() {
-    //      $client = $this->client;
-//
-//
-    //      // Sottrazione di due valori monetari
-    //      $client->request('GET', $this->baseUrl.'/subtract', [
-    //          'firstValue' => '5p17s8d',
-    //          'secondValue' => '3p4s10d',
-    //      ]);
-//
-    //      $this->assertResponseIsSuccessful();
-    //      $this->assertJsonResponse($client->getResponse(), [
-    //          'result' => '2p12s10d',
-    //      ]);
-    //  }
-//
+
+    /**
+     * @throws GuzzleException
+     */
+    public function testSubtractMoney() {
+          $response = $this->client->get($this->baseUrl.'/subtraction', [
+              "query" => [
+                  'firstValue' => '5p17s8d',
+                  'secondValue' => '3p4s10d',
+              ]
+          ]);
+
+          $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+          $this->assertJsonResponse($response->getBody(), [
+              'result' => '2p12s10d',
+          ]);
+      }
+
     //  // Test: Moltiplicazione con un intero
     //  public function testMultiplyMoneyByInteger() {
     //      $client = $this->client;
