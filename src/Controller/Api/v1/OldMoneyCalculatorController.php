@@ -177,6 +177,9 @@ class OldMoneyCalculatorController extends AbstractController {
     #[OA\Response(
         response: 200,
         description: 'Returns the division of two amounts and the rest of the division.',
+        content: new OA\JsonContent(
+            example: '{"result": "0p5s3d","remainder": "0p0s0d"}'
+        )
     )]
     public function division(
         ValidatorInterface $validator,
