@@ -29,10 +29,6 @@ class OldMoneyCalculatorController extends AbstractController {
      */
     #[Route('/sum', name: 'sum', methods: ['GET'])]
     #[OA\Get(summary: 'Computes the sum between two amounts.')]
-    #[OA\Response(
-        response: 200,
-        description: 'Returns the sum of two amounts',
-    )]
     #[OA\Parameter(
         name: 'firstValue',
         description: 'The first value of the amount to be sum. SHOULD respect the format XpYsZd, where X, Y, and Z are integers.',
@@ -44,6 +40,14 @@ class OldMoneyCalculatorController extends AbstractController {
         description: 'The second value of the amount to be sum to the first. SHOULD respect the format XpYsZd, where X, Y, and Z are integers.',
         in: 'query',
         schema: new OA\Schema(type: 'string', example: "5p6s4d")
+    )]
+
+    #[OA\Response(
+        response: 200,
+        description: 'Returns the sum of two amounts',
+        content: new OA\JsonContent(
+            example: '{"result": "0p5s3d"}'
+        )
     )]
     public function addition(
         #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $firstValue,
@@ -93,8 +97,18 @@ class OldMoneyCalculatorController extends AbstractController {
         schema: new OA\Schema(type: 'string', example: "1p6s3d")
     )]
     #[OA\Response(
+        response: 400,
+        description: 'If the first amount is less than the second, an error is thrown.',
+        content: new OA\JsonContent(
+            example: '{"error": "message"}'
+        )
+    )]
+    #[OA\Response(
         response: 200,
         description: 'Returns the subtraction of two amounts',
+        content: new OA\JsonContent(
+            example: '{"result": "0p5s3d"}'
+        )
     )]
     public function subtraction(
         #[MapQueryParameter(filter: \FILTER_VALIDATE_REGEXP, options: ['regexp' => Amount::REGEX_VALIDATION_VALUE])] string $firstValue,
@@ -104,8 +118,7 @@ class OldMoneyCalculatorController extends AbstractController {
         $secondAmount = Amount::fromString($secondValue);
 
         if($firstAmount < $secondAmount) {
-            throw new BadRequestHttpException('The first amount is less than the second, operation not permitted.
-             You cannot subtract money an import of money greater than the first, or you risk debt!');
+            return new JsonResponse(["error" => 'The first amount is less than the second, operation not permitted. You cannot subtract money an import of money greater than the first, or you risk debt!'], Response::HTTP_BAD_REQUEST);
         }
 
         return $this->json([
@@ -133,6 +146,16 @@ class OldMoneyCalculatorController extends AbstractController {
     #[OA\Response(
         response: 200,
         description: 'Returns the multiplication of two amounts',
+        content: new OA\JsonContent(
+            example: '{"result": "0p5s3d"}'
+        )
+    )]
+    #[OA\Response(
+        response: 400,
+        description: 'If the multiplier is less than 0, an error is thrown.',
+        content: new OA\JsonContent(
+            example: '{"error": "string", "errors": "string"}'
+        )
     )]
     public function multiplication(
         ValidatorInterface $validator,
@@ -141,7 +164,7 @@ class OldMoneyCalculatorController extends AbstractController {
     ): JsonResponse {
         $firstAmount = Amount::fromString($firstValue);
 
-        // Asserting that multiplier is eq or greather than 0
+        // Asserting that multiplier is eq or greater than 0
         $errors = $validator->validate($multiplier, [
             new Assert\NotBlank(),
             new Assert\NotNull(),
@@ -179,6 +202,13 @@ class OldMoneyCalculatorController extends AbstractController {
         description: 'Returns the division of two amounts and the rest of the division.',
         content: new OA\JsonContent(
             example: '{"result": "0p5s3d","remainder": "0p0s0d"}'
+        )
+    )]
+    #[OA\Response(
+        response: 400,
+        description: 'If the divider is less than 1, an error is thrown.',
+        content: new OA\JsonContent(
+            example: '{"error": "string", "errors": "string"}'
         )
     )]
     public function division(
