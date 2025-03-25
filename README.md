@@ -32,5 +32,8 @@ Nel caso della divisione, se è presente un resto, questo sarà indicato tra par
 
 
 ## Commands to execute at startup
+
+- Copy file .env.example into .env, customize internal variables
+
 `docker compose exec php bash`
 (inside the container) `symfony console doctrine:migrations:migrate`

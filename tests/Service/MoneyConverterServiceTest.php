@@ -29,7 +29,7 @@ class MoneyConverterServiceTest extends TestCase
         $this->assertTrue($result[1] == 6);
     }
 
-    public function test(){ //5p 17s 8d = 1412 pences (first value)
+    //public function test(){ //5p 17s 8d = 1412 pences (first value)
      //   $firstValueInPences = Amount::convertPoundsToPences(18) + Amount::convertShillingsToPences(16) + 1;
 //
      //   // 3p 4s 10d
@@ -39,5 +39,5 @@ class MoneyConverterServiceTest extends TestCase
      //   var_dump(Amount::convertPencesToAmount($firstValueInPences%15));
 
 
-    }
+   // }
 }
