@@ -21,6 +21,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Validator as CustomValidators;
 
+#[Route('/oldMoneyCalculator', name: 'oldMoneyCalculator')]
 #[OA\Tag(name: 'Old Money System Calculator APIs', description: "These APIs calculates the basic mathematical operations with an old money system.")]
 class OldMoneyCalculatorController extends AbstractController {
 

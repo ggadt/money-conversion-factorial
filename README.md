@@ -29,3 +29,8 @@ Nel caso della divisione, se è presente un resto, questo sarà indicato tra par
 - Implem. p. 2 - 3
 - Test
 - Swagger / Interfaccia grafica
+
+
+## Commands to execute at startup
+`docker compose exec php bash`
+(inside the container) `symfony console doctrine:migrations:migrate`
