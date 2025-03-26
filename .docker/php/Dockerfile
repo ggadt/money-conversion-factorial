@@ -25,7 +25,8 @@ RUN docker-php-ext-configure gd --with-jpeg --with-freetype
 RUN docker-php-ext-install \
     pdo pdo_mysql pdo_pgsql zip xsl gd intl opcache exif mbstring
 
-# COPY cert_custom.pem /usr/local/share/ca-certificates/cert_custom.crt
+# Root CA for ZScaler issue
+COPY cert_custom.pem /usr/local/share/ca-certificates/cert_custom.crt
 RUN update-ca-certificates
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \

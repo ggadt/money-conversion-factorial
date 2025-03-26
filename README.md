@@ -36,4 +36,12 @@ Nel caso della divisione, se è presente un resto, questo sarà indicato tra par
 - Copy file .env.example into .env, customize internal variables
 
 `docker compose exec php bash`
-(inside the container) `symfony console doctrine:migrations:migrate`
+
+### Installazione delle librerie
+(inside the container) `composer install`
+
+### Esecuzione delle migrations per strutturare il database
+(inside the container) `sf doctrine:migrations:migrate`
+
+### Esecuzione batteria dei test
+(inside the container) `./vendor/bin/phpunit`

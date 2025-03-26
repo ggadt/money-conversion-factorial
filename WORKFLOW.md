@@ -42,6 +42,9 @@ Assunto che:
 
 # Endpoints
 
+Il seguente è solo un brainstorming, le info potrebbero essere outdated.
+Le API effettive sono incluse nello swagger visibile nell'interfaccia grafica.
+
 ### GET /sum 
 
 - Parametri query
